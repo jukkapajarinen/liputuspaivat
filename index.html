@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<title>Suomen liputuspäivät</title>
+<link href="tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+
+<h1 class="text-3xl font-bold text-center mb-6">
+  Suomen liputuspäivät <span id="year"></span>
+</h1>
+
+<noscript class="text-red-600 text-sm flex justify-center">
+  Tämä kalenteri vaatii JavaScriptin toimiakseen.
+</noscript>
+
+<table id="calendar" class="table-fixed w-full border-collapse text-sm text-center"></table>
+
+<p class="text-sm flex justify-center mt-6">Tekijä: Jukka Pajarinen</p>
+<p class="text-sm flex justify-center gap-4">
+  <a class="text-blue-800" href="www.jukkapajarinen.com">www.jukkapajarinen.com</a>
+  <a class="text-blue-800" href="www.lumitum.com">www.lumitum.com</a>
+</p>
+
+<script>
+const calendar = document.getElementById("calendar");
+
+// Create the thead
+const thead = document.createElement("thead");
+thead.className = "bg-gray-300";
+
+const headRow = document.createElement("tr");
+["Viikko","Ma","Ti","Ke","To","Pe","La","Su"].forEach((day, i) => {
+  const th = document.createElement("th");
+  th.className = `border border-gray-400 ${i===0?'w-14':''} bg-gray-300 ${i>=6?'text-red-600':''}`;
+  th.textContent = day;
+  headRow.appendChild(th);
+});
+thead.appendChild(headRow);
+calendar.appendChild(thead);
+
+// Create tbody
+const tbody = document.createElement("tbody");
+tbody.id = "calendar-body";
+calendar.appendChild(tbody);
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const year = today.getFullYear();
+document.getElementById("year").textContent = year;
+
+/* ---------- HELPERS ---------- */
+const getWeekNumber = date => {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+};
+
+const nthSunday = (month, n) => {
+  const d = new Date(year, month, 1);
+  let count = 0;
+  while (true) {
+    if (d.getDay() === 0) count++;
+    if (count === n) return new Date(d);
+    d.setDate(d.getDate() + 1);
+  }
+};
+
+const lastSaturday = month => {
+  const d = new Date(year, month + 1, 0);
+  while (d.getDay() !== 6) d.setDate(d.getDate() - 1);
+  return new Date(d);
+};
+
+const midsummerDay = () => {
+  for (let d = 20; d <= 26; d++) {
+    const date = new Date(year, 5, d);
+    if (date.getDay() === 6) return date;
+  }
+};
+
+/* ---------- FLAG DAYS ---------- */
+const flags = {}; // { "Fri Feb 28 2024": [{name, rule, category}] }
+
+const addFlag = (date, name, rule, cat) => {
+  const key = date.toDateString();
+  if (!flags[key]) flags[key] = [];
+  flags[key].push({ name, rule, category: cat });
+};
+
+// Official flag days
+[
+  [1, 28, "Kalevalan päivä", "28.2."],
+  [4, 1, "Vappu", "1.5."],
+  [5, 4, "Puolustusvoimain lippujuhlan päivä", "4.6."],
+  [5, 0, "Juhannuspäivä – Suomen lipun päivä", "Kesäkuun 20.–26. lauantai"],
+  [10, 0, "Isänpäivä", "Marraskuun toinen sunnuntai"],
+  [4, 0, "Äitienpäivä", "Toukokuun toinen sunnuntai"],
+  [11, 6, "Itsenäisyyspäivä", "6.12."]
+].forEach(([m, d, name, rule]) => {
+  let date;
+  if (d === 0 && name === "Juhannuspäivä – Suomen lipun päivä") date = midsummerDay();
+  else if (d === 0 && name === "Äitienpäivä") date = nthSunday(4, 2);
+  else if (d === 0 && name === "Isänpäivä") date = nthSunday(10, 2);
+  else date = new Date(year, m, d);
+  addFlag(date, name, rule, "virallinen");
+});
+
+// Established flag days
+[
+  [1, 5, "J. L. Runebergin päivä", "5.2."],
+  [2, 19, "Minna Canthin päivä", "19.3."],
+  [3, 9, "Mikael Agricolan päivä", "9.4."],
+  [3, 27, "Kansallinen veteraanipäivä", "27.4."],
+  [4, 9, "Eurooppa-päivä", "9.5."],
+  [4, 12, "J. V. Snellmanin päivä", "12.5."],
+  [4, 0, "Kaatuneitten muistopäivä", "Toukokuun kolmas sunnuntai"],
+  [6, 6, "Eino Leinon päivä", "6.7."],
+  [7, 0, "Suomen luonnon päivä", "Elokuun viimeinen lauantai"],
+  [9, 1, "Miina Sillanpään päivä", "1.10."],
+  [9, 10, "Aleksis Kiven päivä", "10.10."],
+  [9, 24, "YK:n päivä", "24.10."],
+  [10, 6, "Ruotsalaisuuden päivä", "6.11."],
+  [10, 20, "Lapsen oikeuksien päivä", "20.11."],
+  [11, 8, "Jean Sibeliuksen päivä", "8.12."]
+].forEach(([m, d, name, rule]) => {
+  let date;
+  if (d === 0 && name === "Kaatuneitten muistopäivä") date = nthSunday(4, 3);
+  else if (d === 0 && name === "Suomen luonnon päivä") date = lastSaturday(7);
+  else date = new Date(year, m, d);
+  addFlag(date, name, rule, "vakiintunut");
+});
+
+/* ---------- CALENDAR ---------- */
+let date = new Date(year, 0, 1);
+
+// Move to the first Monday before the year's start
+while (date.getDay() !== 1) date.setDate(date.getDate() - 1);
+
+const monthBg = ["bg-white","bg-gray-200","bg-white","bg-gray-200","bg-white","bg-gray-200",
+                 "bg-white","bg-gray-200","bg-white","bg-gray-200","bg-white","bg-gray-200"];
+
+const monthNames = ["tammi","helmi","maalis","huhti","touko","kesä",
+                    "heinä","elo","syys","loka","marras","joulu"];
+
+let currentMonth = -1;
+
+while (date.getFullYear() <= year) {
+  if (date.getMonth() !== currentMonth) currentMonth = date.getMonth();
+
+  const tr = document.createElement("tr");
+
+  // Week number
+  const weekTd = document.createElement("td");
+  weekTd.textContent = getWeekNumber(date);
+  weekTd.className = "border border-gray-400 text-gray-700 bg-gray-300";
+  tr.appendChild(weekTd);
+
+  for (let i = 0; i < 7; i++) {
+    const td = document.createElement("td");
+    td.className = "border border-gray-400 align-top";
+
+    if (date.getFullYear() === year) {
+      // Day number and month name
+      let dayText = date.getDate();
+      if (dayText === 1) dayText += `.${monthNames[date.getMonth()]}`;
+      td.innerHTML = `<div class="font-semibold">${dayText}</div>`;
+
+      // Background color
+      td.classList.add(monthBg[date.getMonth()]);
+
+      // Past days
+      if (date < today) td.classList.add("text-gray-400", "line-through");
+
+      // Today
+      if (date.getTime() === today.getTime()) {
+        td.classList.remove("bg-white", "bg-gray-200");
+        td.classList.add("bg-green-300");
+      }
+
+      // Flag days
+      const dayFlags = flags[date.toDateString()];
+      if (dayFlags) {
+        // If any flag is "virallinen", the cell is bg-blue-300
+        const isOfficial = dayFlags.some(f => f.category === "virallinen");
+        td.classList.remove("bg-white", "bg-gray-200");
+        td.classList.add(isOfficial ? "bg-blue-300" : "bg-blue-100");
+
+        td.title = dayFlags.map(f => `${f.name} (${f.rule})`).join("\n");
+        td.innerHTML += `<div class="text-xs text-blue-800">${dayFlags.map(f => f.name).join(", ")}</div>`;
+      }
+    } else {
+      td.classList.add("bg-gray-100");
+    }
+
+    tr.appendChild(td);
+    date.setDate(date.getDate() + 1);
+  }
+
+  tbody.appendChild(tr);
+}
+</script>
+
+</body>
+</html>

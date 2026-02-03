@@ -1,6 +1,6 @@
 # Liputuspäivät
 
-Suomen vakiintuneet liputuspäivät HTML-kalenterissa, jonka voi ladata .iCal-tiedostona.
+Suomen vakiintuneet liputuspäivät HTML-kalenterissa.
 
 ## Author
 
