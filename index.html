@@ -48,6 +48,7 @@ calendar.appendChild(tbody);
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
+
 const year = today.getFullYear();
 document.getElementById("year").textContent = year;
 
@@ -176,12 +177,6 @@ while (date.getFullYear() <= year) {
       // Past days
       if (date < today) td.classList.add("text-gray-400", "line-through");
 
-      // Today
-      if (date.getTime() === today.getTime()) {
-        td.classList.remove("bg-white", "bg-gray-200");
-        td.classList.add("bg-green-300");
-      }
-
       // Flag days
       const dayFlags = flags[date.toDateString()];
       if (dayFlags) {
@@ -192,6 +187,13 @@ while (date.getFullYear() <= year) {
 
         td.title = dayFlags.map(f => `${f.name} (${f.rule})`).join("\n");
         td.innerHTML += `<div class="text-xs text-blue-800">${dayFlags.map(f => f.name).join(", ")}</div>`;
+      }
+
+      // Today
+      if (date.getTime() === today.getTime()) {
+        const wasOfficial = dayFlags && dayFlags.some(f => f.category === "virallinen");
+        td.classList.remove("bg-white", "bg-gray-200", "bg-blue-300", "bg-blue-100");
+        td.classList.add(wasOfficial ? "bg-green-300" : "bg-green-100");
       }
     } else {
       td.classList.add("bg-gray-100");
