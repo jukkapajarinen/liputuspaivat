@@ -169,7 +169,7 @@ while (date.getFullYear() <= year) {
       // Day number and month name
       let dayText = date.getDate();
       if (dayText === 1) dayText += `.${monthNames[date.getMonth()]}`;
-      td.innerHTML = `<div class="font-semibold">${dayText}</div>`;
+      td.innerHTML = `<div class="day font-semibold">${dayText}</div>`;
 
       // Background color
       td.classList.add(monthBg[date.getMonth()]);
@@ -194,6 +194,12 @@ while (date.getFullYear() <= year) {
         const wasOfficial = dayFlags && dayFlags.some(f => f.category === "virallinen");
         td.classList.remove("bg-white", "bg-gray-200", "bg-blue-300", "bg-blue-100");
         td.classList.add(wasOfficial ? "bg-green-300" : "bg-green-100");
+        
+        // 🇫🇮 if today is a flag day
+        if (dayFlags) {
+          const dayDiv = td.querySelector(".day");
+          dayDiv.textContent += " 🇫🇮";
+        }
       }
     } else {
       td.classList.add("bg-gray-100");
