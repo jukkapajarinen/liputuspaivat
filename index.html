@@ -11,6 +11,28 @@
   Suomen liputuspäivät <span id="year"></span>
 </h1>
 
+<p class="text-center mb-6 text-sm space-y-1">
+  <a href="#" onclick="downloadICS(0); return false;"
+     class="block text-blue-800 hover:underline">
+    Lataa liputuspäivät 2026 kalenteriisi (.ics)
+  </a>
+
+  <a href="#" onclick="downloadICS(25); return false;"
+     class="block text-blue-800 hover:underline">
+    Lataa liputuspäivät 2026 + 25 vuotta kalenteriisi (.ics)
+  </a>
+
+  <a href="#" onclick="downloadICS(50); return false;"
+     class="block text-blue-800 hover:underline">
+    Lataa liputuspäivät 2026 + 50 vuotta kalenteriisi (.ics)
+  </a>
+
+  <a href="#" onclick="downloadICS(100); return false;"
+     class="block text-blue-800 hover:underline">
+    Lataa liputuspäivät 2026 + 100 vuotta kalenteriisi (.ics)
+  </a>
+</p>
+
 <noscript class="text-red-600 text-sm flex justify-center">
   Tämä kalenteri vaatii JavaScriptin toimiakseen.
 </noscript>
@@ -210,6 +232,115 @@ while (date.getFullYear() <= year) {
   }
 
   tbody.appendChild(tr);
+}
+</script>
+
+<script>
+/* ===================================================================
+   ======================  ICS EXPORT ===== ==========================
+   =================================================================== */
+
+function downloadICS(yearsAhead) {
+  const startYear = year;
+  const endYear = year + yearsAhead;
+
+  /* ---- YEAR-AWARE HELPERS (ICS ONLY) ---- */
+  const nthSundayY = (year, month, n) => {
+    const d = new Date(year, month, 1);
+    let count = 0;
+    while (true) {
+      if (d.getDay() === 0) count++;
+      if (count === n) return new Date(d);
+      d.setDate(d.getDate() + 1);
+    }
+  };
+
+  const lastSaturdayY = (year, month) => {
+    const d = new Date(year, month + 1, 0);
+    while (d.getDay() !== 6) d.setDate(d.getDate() - 1);
+    return new Date(d);
+  };
+
+  const midsummerDayY = year => {
+    for (let d = 20; d <= 26; d++) {
+      const date = new Date(year, 5, d);
+      if (date.getDay() === 6) return date;
+    }
+  };
+
+  let ics =
+`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Jukka Pajarinen//Suomen liputuspäivät//FI
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+`;
+
+  const pad = n => String(n).padStart(2,"0");
+  const ymd = d => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+
+  const addEvent = (d, name) => {
+    const end = new Date(d);
+    end.setDate(end.getDate() + 1); // proper all-day event
+
+    ics +=
+`BEGIN:VEVENT
+UID:${name.replace(/\s+/g,"-").toLowerCase()}-${ymd(d)}@liputuspv
+DTSTART;VALUE=DATE:${ymd(d)}
+DTEND;VALUE=DATE:${ymd(end)}
+SUMMARY:${name} 🇫🇮
+TRANSP:TRANSPARENT
+END:VEVENT
+`;
+  };
+
+  for (let y = startYear; y <= endYear; y++) {
+
+    // Fixed-date flag days
+    [
+      [1,28,"Kalevalan päivä"],
+      [4,1,"Vappu"],
+      [5,4,"Puolustusvoimain lippujuhlan päivä"],
+      [11,6,"Itsenäisyyspäivä"],
+      [1,5,"J. L. Runebergin päivä"],
+      [2,19,"Minna Canthin päivä"],
+      [3,9,"Mikael Agricolan päivä"],
+      [3,27,"Kansallinen veteraanipäivä"],
+      [4,9,"Eurooppa-päivä"],
+      [4,12,"J. V. Snellmanin päivä"],
+      [6,6,"Eino Leinon päivä"],
+      [9,1,"Miina Sillanpään päivä"],
+      [9,10,"Aleksis Kiven päivä"],
+      [9,24,"YK:n päivä"],
+      [10,6,"Ruotsalaisuuden päivä"],
+      [10,20,"Lapsen oikeuksien päivä"],
+      [11,8,"Jean Sibeliuksen päivä"]
+    ].forEach(([m,d,n]) => addEvent(new Date(y,m,d), n));
+
+    // Movable flag days (FIXED)
+    addEvent(nthSundayY(y,4,2), "Äitienpäivä");
+    addEvent(nthSundayY(y,10,2), "Isänpäivä");
+    addEvent(nthSundayY(y,4,3), "Kaatuneitten muistopäivä");
+    addEvent(lastSaturdayY(y,7), "Suomen luonnon päivä");
+    addEvent(midsummerDayY(y), "Juhannuspäivä – Suomen lipun päivä");
+  }
+
+  ics += "END:VCALENDAR";
+
+  const blob = new Blob([ics], { type:"text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download =
+    yearsAhead === 0
+      ? `suomen-liputuspaivat-${startYear}.ics`
+      : `suomen-liputuspaivat-${startYear}-${endYear}.ics`;
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 </script>
 
