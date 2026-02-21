@@ -5,7 +5,7 @@
 <title>Suomen liputuspäivät</title>
 <link href="tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 p-6">
+<body class="bg-white p-6">
 
 <h1 class="text-3xl font-bold text-center mb-6">
   Suomen liputuspäivät <span id="year"></span>
@@ -37,7 +37,9 @@
   Tämä kalenteri vaatii JavaScriptin toimiakseen.
 </noscript>
 
-<table id="calendar" class="table-fixed w-full border-collapse text-sm text-center"></table>
+<div class="w-10/12 mx-auto rounded-md shadow-md overflow-hidden bg-white">
+  <table id="calendar" class="table-fixed w-full border-collapse text-sm text-center"></table>
+</div>
 
 <p class="text-sm flex justify-center mt-6">Tekijä: Jukka Pajarinen</p>
 <p class="text-sm flex flex-col items-center">
@@ -50,15 +52,16 @@ const calendar = document.getElementById("calendar");
 
 // Create the thead
 const thead = document.createElement("thead");
-thead.className = "bg-gray-300";
+thead.className = "bg-gray-100";
 
 const headRow = document.createElement("tr");
 ["Viikko","Ma","Ti","Ke","To","Pe","La","Su"].forEach((day, i) => {
   const th = document.createElement("th");
-  th.className = `border border-gray-400 ${i===0?'w-14':''} bg-gray-300 ${i>=6?'text-red-600':''}`;
+  th.className = `border border-gray-300 ${i===0?'w-14':''} bg-gray-100}`;
   th.textContent = day;
   headRow.appendChild(th);
 });
+headRow.className = "h-10";
 thead.appendChild(headRow);
 calendar.appendChild(thead);
 
@@ -176,22 +179,23 @@ while (date.getFullYear() <= year) {
   if (date.getMonth() !== currentMonth) currentMonth = date.getMonth();
 
   const tr = document.createElement("tr");
+  tr.className = "h-24";
 
   // Week number
   const weekTd = document.createElement("td");
   weekTd.textContent = getWeekNumber(date);
-  weekTd.className = "border border-gray-400 text-gray-700 bg-gray-300";
+  weekTd.className = "border border-gray-300 text-gray-700 bg-gray-100";
   tr.appendChild(weekTd);
 
   for (let i = 0; i < 7; i++) {
     const td = document.createElement("td");
-    td.className = "border border-gray-400 align-top";
+    td.className = "border border-gray-300 align-top p-2";
 
     if (date.getFullYear() === year) {
       // Day number and month name
       let dayText = date.getDate();
       if (dayText === 1) dayText += `.${monthNames[date.getMonth()]}`;
-      td.innerHTML = `<div class="day font-semibold">${dayText}</div>`;
+      td.innerHTML = `<div class="day font-semibold text-right">${dayText}</div>`;
 
       // Background color
       td.classList.add(monthBg[date.getMonth()]);
@@ -208,7 +212,7 @@ while (date.getFullYear() <= year) {
         td.classList.add(isOfficial ? "bg-blue-300" : "bg-blue-100");
 
         td.title = dayFlags.map(f => `${f.name} (${f.rule})`).join("\n");
-        td.innerHTML += `<div class="text-xs text-blue-800">${dayFlags.map(f => f.name).join(", ")}</div>`;
+        td.innerHTML += `<div class="text-blue-800 mt-2">${dayFlags.map(f => f.name).join(", ")}</div>`;
       }
 
       // Today
