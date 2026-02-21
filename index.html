@@ -216,6 +216,7 @@ while (date.getFullYear() <= year) {
         const isOfficial = dayFlags.some(f => f.category === "virallinen");
         td.classList.remove("bg-white", "bg-gray-200");
         td.classList.add(isOfficial ? "bg-blue-300" : "bg-blue-100");
+        td.classList.add("cursor-help");
 
         td.title = dayFlags.map(f => `${f.name} (${f.rule})`).join("\n");
         td.innerHTML += `<div class="text-blue-800 mt-2">${dayFlags.map(f => f.name).join(", ")}</div>`;
