@@ -1,365 +1,76 @@
 <!DOCTYPE html>
 <html lang="fi">
-<head>
-<meta charset="UTF-8">
-<title>Suomen liputuspäivät</title>
-<link rel="icon" type="image/x-icon" href="favicon.ico" />
-<link href="tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-white text-gray-900" style="background: #ffffff; background-image: radial-gradient(#7c7c7c47 1px, #ffffff 1px); background-size: 12px 12px;">
-<div class="max-w-screen-2xl mx-auto p-8">
+  <head>
+    <meta charset="UTF-8">
+    <title>Suomen liputuspäivät</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link href="tailwind.min.css" rel="stylesheet">
+  </head>
+  <body class="bg-gray-50 text-gray-900" style="background: #f8fafc; background-image: radial-gradient(#cbd5e133 1px, transparent 1px); background-size: 16px 16px;">
+    <header class="bg-gradient-to-r from-blue-800 via-blue-700 to-indigo-800 relative overflow-hidden">
+      <div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(45deg, #ffffff 0, #ffffff 1px, transparent 0, transparent 12px);"></div>
+      <div class="max-w-screen-2xl mx-auto px-8 py-10 relative">
+        <div class="flex items-center gap-4">
+          <img src="favicon.ico" alt="" class="w-12 h-12 rounded-lg shadow-lg bg-white p-1">
+          <div>
+            <h1 class="text-3xl font-black text-white tracking-tight">
+              Suomen liputuspäivät <span id="year" class="text-blue-200"></span>
+            </h1>
+            <p class="text-blue-200 text-sm mt-1">Viralliset ja vakiintuneet liputuspäivät kalenterina</p>
+          </div>
+        </div>
+      </div>
+    </header>
 
-<div class="flex items-center gap-3 mb-8">
-  <img src="favicon.ico" alt="" class="w-8 h-8">
-  <h1 class="text-2xl font-semibold">
-    Suomen liputuspäivät <span id="year"></span>
-  </h1>
-</div>
+    <div class="max-w-screen-2xl mx-auto p-8">
+      <div class="flex flex-wrap items-center gap-3 mb-6">
+        <a href="#" onclick="downloadICS(0); return false;"
+          class="inline-flex items-center gap-2 bg-blue-800 hover:bg-blue-900 text-white font-semibold px-4 py-2 rounded-full shadow transition duration-200 hover:shadow-lg">
+          📅 Lataa liputuspäivät <span id="year-btn"></span> (.ics)
+        </a>
+        <a href="#" onclick="downloadICS(25); return false;"
+          class="inline-flex items-center gap-1 bg-white hover:bg-blue-50 text-blue-800 font-medium px-4 py-2 rounded-full shadow border border-blue-200 transition duration-200">
+          + 25 vuotta
+        </a>
+        <a href="#" onclick="downloadICS(50); return false;"
+          class="inline-flex items-center gap-1 bg-white hover:bg-blue-50 text-blue-800 font-medium px-4 py-2 rounded-full shadow border border-blue-200 transition duration-200">
+          + 50 vuotta
+        </a>
+        <a href="#" onclick="downloadICS(100); return false;"
+          class="inline-flex items-center gap-1 bg-white hover:bg-blue-50 text-blue-800 font-medium px-4 py-2 rounded-full shadow border border-blue-200 transition duration-200">
+          + 100 vuotta
+        </a>
+      </div>
 
-<p class="mb-6 space-y-1">
-  <a href="#" onclick="downloadICS(0); return false;"
-     class="text-blue-800 hover:underline">
-    Lataa liputuspäivät 2026 kalenteriisi (.ics)
-  </a>
-  <span class="mx-2 text-gray-400">|</span>
-  <a href="#" onclick="downloadICS(25); return false;"
-     class="text-blue-800 hover:underline">
-    + 25 vuotta
-  </a>
-  <span class="mx-2 text-gray-400">|</span>
-  <a href="#" onclick="downloadICS(50); return false;"
-     class="text-blue-800 hover:underline">
-    + 50 vuotta
-  </a>
-  <span class="mx-2 text-gray-400">|</span>
-  <a href="#" onclick="downloadICS(100); return false;"
-     class="text-blue-800 hover:underline">
-    + 100 vuotta
-  </a>
-</p>
+      <div class="flex flex-wrap items-center gap-4 mb-8 text-xs text-gray-600">
+        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-blue-200 border-l-4 border-blue-700 inline-block"></span> Virallinen liputuspäivä</span>
+        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-indigo-100 border-l-4 border-indigo-500 inline-block"></span> Vakiintunut liputuspäivä</span>
+        <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-green-200 ring-2 ring-green-500 ring-inset inline-block"></span> Tänään</span>
+        <span class="inline-flex items-center gap-1.5 text-gray-600 cursor-help"
+              title="Kalenterista puuttuvat liputuspäivät, joiden ajankohta ei ole kiinteä: päivä, jolloin Suomessa toimitetaan valtiolliset vaalit, aluevaalit, kuntavaalit, Euroopan parlamentin edustajien vaalit tai neuvoa-antava kansanäänestys, sekä päivä, jolloin tasavallan presidentti astuu toimeensa.">
+          ⚠️ Ei sisällä vaali- tai presidentin virkaanastujaispäiviä
+        </span>
+      </div>
 
-<noscript class="text-red-600 text-sm flex justify-center">
-  Tämä kalenteri vaatii JavaScriptin toimiakseen.
-</noscript>
+      <noscript class="text-red-600 text-sm flex justify-center">
+        Tämä kalenteri vaatii JavaScriptin toimiakseen.
+      </noscript>
 
-<div class="mx-auto overflow-hidden bg-white">
-  <table id="calendar" class="table-fixed w-full border-collapse text-sm text-center"></table>
-</div>
+      <div class="mx-auto overflow-hidden bg-white rounded-xl shadow-lg border border-gray-200">
+        <table id="calendar" class="table-fixed w-full border-collapse text-sm text-center"></table>
+      </div>
 
-<div class="text-sm text-gray-600 mt-8">
-Kalenterin toteutus: Jukka Pajarinen
-</div>
+      <div class="text-sm text-gray-500 mt-8 text-center">
+        Kalenterin toteutus: Jukka Pajarinen
+      </div>
 
-<div class="text-sm text-gray-600">
-<a class="text-blue-800 hover:underline" href="https://www.jukkapajarinen.com" target="_blank">www.jukkapajarinen.com</a>
-<span class="mx-2">|</span>
-<a class="text-blue-800 hover:underline" href="https://www.lumitum.com" target="_blank">www.lumitum.com</a>
-</div>
+      <div class="text-sm mt-1 text-center">
+        <a class="text-blue-800 hover:underline font-medium" href="https://www.jukkapajarinen.com" target="_blank">www.jukkapajarinen.com</a>
+        <span class="mx-2 text-gray-300">|</span>
+        <a class="text-blue-800 hover:underline font-medium" href="https://www.lumitum.com" target="_blank">www.lumitum.com</a>
+      </div>
+    </div>
 
-</div>
-
-<script>
-const calendar = document.getElementById("calendar");
-
-// Create the thead
-const thead = document.createElement("thead");
-thead.className = "bg-gray-100";
-
-const headRow = document.createElement("tr");
-["Viikko","Ma","Ti","Ke","To","Pe","La","Su"].forEach((day, i) => {
-  const th = document.createElement("th");
-  th.className = `border border-gray-300 ${i===0?'w-14':''} bg-gray-100}`;
-  th.textContent = day;
-  headRow.appendChild(th);
-});
-headRow.className = "h-10";
-thead.appendChild(headRow);
-calendar.appendChild(thead);
-
-// Create tbody
-const tbody = document.createElement("tbody");
-tbody.id = "calendar-body";
-calendar.appendChild(tbody);
-
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-
-
-const year = today.getFullYear();
-document.getElementById("year").textContent = year;
-document.title += ` ${year}`;
-
-/* ---------- HELPERS ---------- */
-const getWeekNumber = date => {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const dayNum = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-};
-
-const nthSunday = (month, n) => {
-  const d = new Date(year, month, 1);
-  let count = 0;
-  while (true) {
-    if (d.getDay() === 0) count++;
-    if (count === n) return new Date(d);
-    d.setDate(d.getDate() + 1);
-  }
-};
-
-const lastSaturday = month => {
-  const d = new Date(year, month + 1, 0);
-  while (d.getDay() !== 6) d.setDate(d.getDate() - 1);
-  return new Date(d);
-};
-
-const midsummerDay = () => {
-  for (let d = 20; d <= 26; d++) {
-    const date = new Date(year, 5, d);
-    if (date.getDay() === 6) return date;
-  }
-};
-
-/* ---------- FLAG DAYS ---------- */
-const flags = {}; // { "Fri Feb 28 2024": [{name, rule, category}] }
-
-const addFlag = (date, name, rule, cat) => {
-  const key = date.toDateString();
-  if (!flags[key]) flags[key] = [];
-  flags[key].push({ name, rule, category: cat });
-};
-
-// Official flag days
-[
-  [1, 28, "Kalevalan päivä", "28.2."],
-  [4, 1, "Vappu", "1.5."],
-  [5, 4, "Puolustusvoimain lippujuhlan päivä", "4.6."],
-  [5, 0, "Juhannuspäivä – Suomen lipun päivä", "Kesäkuun 20.–26. lauantai"],
-  [10, 0, "Isänpäivä", "Marraskuun toinen sunnuntai"],
-  [4, 0, "Äitienpäivä", "Toukokuun toinen sunnuntai"],
-  [11, 6, "Itsenäisyyspäivä", "6.12."]
-].forEach(([m, d, name, rule]) => {
-  let date;
-  if (d === 0 && name === "Juhannuspäivä – Suomen lipun päivä") date = midsummerDay();
-  else if (d === 0 && name === "Äitienpäivä") date = nthSunday(4, 2);
-  else if (d === 0 && name === "Isänpäivä") date = nthSunday(10, 2);
-  else date = new Date(year, m, d);
-  addFlag(date, name, rule, "virallinen");
-});
-
-// Established flag days
-[
-  [1, 5, "J. L. Runebergin päivä", "5.2."],
-  [2, 19, "Minna Canthin päivä", "19.3."],
-  [3, 9, "Mikael Agricolan päivä", "9.4."],
-  [3, 27, "Kansallinen veteraanipäivä", "27.4."],
-  [4, 9, "Eurooppa-päivä", "9.5."],
-  [4, 12, "J. V. Snellmanin päivä", "12.5."],
-  [4, 0, "Kaatuneitten muistopäivä", "Toukokuun kolmas sunnuntai"],
-  [6, 6, "Eino Leinon päivä", "6.7."],
-  [7, 0, "Suomen luonnon päivä", "Elokuun viimeinen lauantai"],
-  [9, 1, "Miina Sillanpään päivä", "1.10."],
-  [9, 10, "Aleksis Kiven päivä", "10.10."],
-  [9, 24, "YK:n päivä", "24.10."],
-  [10, 6, "Ruotsalaisuuden päivä", "6.11."],
-  [10, 20, "Lapsen oikeuksien päivä", "20.11."],
-  [11, 8, "Jean Sibeliuksen päivä", "8.12."]
-].forEach(([m, d, name, rule]) => {
-  let date;
-  if (d === 0 && name === "Kaatuneitten muistopäivä") date = nthSunday(4, 3);
-  else if (d === 0 && name === "Suomen luonnon päivä") date = lastSaturday(7);
-  else date = new Date(year, m, d);
-  addFlag(date, name, rule, "vakiintunut");
-});
-
-/* ---------- CALENDAR ---------- */
-let date = new Date(year, 0, 1);
-
-// Move to the first Monday before the year's start
-while (date.getDay() !== 1) date.setDate(date.getDate() - 1);
-
-const monthBg = ["bg-white","bg-gray-200","bg-white","bg-gray-200","bg-white","bg-gray-200",
-                 "bg-white","bg-gray-200","bg-white","bg-gray-200","bg-white","bg-gray-200"];
-
-const monthNames = ["tammi","helmi","maalis","huhti","touko","kesä",
-                    "heinä","elo","syys","loka","marras","joulu"];
-
-let currentMonth = -1;
-
-while (date.getFullYear() <= year) {
-  if (date.getMonth() !== currentMonth) currentMonth = date.getMonth();
-
-  const tr = document.createElement("tr");
-  tr.className = "h-24";
-
-  // Week number
-  const weekTd = document.createElement("td");
-  weekTd.textContent = getWeekNumber(date);
-  weekTd.className = "border border-gray-300 text-gray-700 bg-gray-100";
-  tr.appendChild(weekTd);
-
-  for (let i = 0; i < 7; i++) {
-    const td = document.createElement("td");
-    td.className = "border border-gray-300 align-top p-2";
-
-    if (date.getFullYear() === year) {
-      // Day number and month name
-      let dayText = date.getDate();
-      if (dayText === 1) dayText += `.${monthNames[date.getMonth()]}`;
-      td.innerHTML = `<div class="day font-semibold text-right">${dayText}</div>`;
-
-      // Background color
-      td.classList.add(monthBg[date.getMonth()]);
-
-      // Past days
-      if (date < today) td.classList.add("text-gray-400", "line-through");
-
-      // Flag days
-      const dayFlags = flags[date.toDateString()];
-      if (dayFlags) {
-        // If any flag is "virallinen", the cell is bg-blue-300
-        const isOfficial = dayFlags.some(f => f.category === "virallinen");
-        td.classList.remove("bg-white", "bg-gray-200");
-        td.classList.add(isOfficial ? "bg-blue-300" : "bg-blue-100");
-        td.classList.add("cursor-help");
-
-        td.title = dayFlags.map(f => `${f.name} (${f.rule})`).join("\n");
-        td.innerHTML += `<div class="text-blue-800 mt-2">${dayFlags.map(f => f.name).join(", ")}</div>`;
-      }
-
-      // Today
-      if (date.getTime() === today.getTime()) {
-        const wasOfficial = dayFlags && dayFlags.some(f => f.category === "virallinen");
-        td.classList.remove("bg-white", "bg-gray-200", "bg-blue-300", "bg-blue-100");
-        td.classList.add(wasOfficial ? "bg-green-300" : "bg-green-100");
-        
-        // 🇫🇮 if today is a flag day
-        if (dayFlags) {
-          const dayDiv = td.querySelector(".day");
-          dayDiv.textContent += " 🇫🇮";
-        }
-      }
-    } else {
-      td.classList.add("bg-gray-100");
-    }
-
-    tr.appendChild(td);
-    date.setDate(date.getDate() + 1);
-  }
-
-  tbody.appendChild(tr);
-}
-</script>
-
-<script>
-/* ===================================================================
-   ======================  ICS EXPORT ===== ==========================
-   =================================================================== */
-
-function downloadICS(yearsAhead) {
-  const startYear = year;
-  const endYear = year + yearsAhead;
-
-  /* ---- YEAR-AWARE HELPERS (ICS ONLY) ---- */
-  const nthSundayY = (year, month, n) => {
-    const d = new Date(year, month, 1);
-    let count = 0;
-    while (true) {
-      if (d.getDay() === 0) count++;
-      if (count === n) return new Date(d);
-      d.setDate(d.getDate() + 1);
-    }
-  };
-
-  const lastSaturdayY = (year, month) => {
-    const d = new Date(year, month + 1, 0);
-    while (d.getDay() !== 6) d.setDate(d.getDate() - 1);
-    return new Date(d);
-  };
-
-  const midsummerDayY = year => {
-    for (let d = 20; d <= 26; d++) {
-      const date = new Date(year, 5, d);
-      if (date.getDay() === 6) return date;
-    }
-  };
-
-  let ics =
-`BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Jukka Pajarinen//Suomen liputuspäivät//FI
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-`;
-
-  const pad = n => String(n).padStart(2,"0");
-  const ymd = d => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
-
-  const addEvent = (d, name) => {
-    const end = new Date(d);
-    end.setDate(end.getDate() + 1); // proper all-day event
-
-    ics +=
-`BEGIN:VEVENT
-UID:${name.replace(/\s+/g,"-").toLowerCase()}-${ymd(d)}@liputuspv
-DTSTART;VALUE=DATE:${ymd(d)}
-DTEND;VALUE=DATE:${ymd(end)}
-SUMMARY:${name} 🇫🇮
-TRANSP:TRANSPARENT
-END:VEVENT
-`;
-  };
-
-  for (let y = startYear; y <= endYear; y++) {
-
-    // Fixed-date flag days
-    [
-      [1,28,"Kalevalan päivä"],
-      [4,1,"Vappu"],
-      [5,4,"Puolustusvoimain lippujuhlan päivä"],
-      [11,6,"Itsenäisyyspäivä"],
-      [1,5,"J. L. Runebergin päivä"],
-      [2,19,"Minna Canthin päivä"],
-      [3,9,"Mikael Agricolan päivä"],
-      [3,27,"Kansallinen veteraanipäivä"],
-      [4,9,"Eurooppa-päivä"],
-      [4,12,"J. V. Snellmanin päivä"],
-      [6,6,"Eino Leinon päivä"],
-      [9,1,"Miina Sillanpään päivä"],
-      [9,10,"Aleksis Kiven päivä"],
-      [9,24,"YK:n päivä"],
-      [10,6,"Ruotsalaisuuden päivä"],
-      [10,20,"Lapsen oikeuksien päivä"],
-      [11,8,"Jean Sibeliuksen päivä"]
-    ].forEach(([m,d,n]) => addEvent(new Date(y,m,d), n));
-
-    // Movable flag days (FIXED)
-    addEvent(nthSundayY(y,4,2), "Äitienpäivä");
-    addEvent(nthSundayY(y,10,2), "Isänpäivä");
-    addEvent(nthSundayY(y,4,3), "Kaatuneitten muistopäivä");
-    addEvent(lastSaturdayY(y,7), "Suomen luonnon päivä");
-    addEvent(midsummerDayY(y), "Juhannuspäivä – Suomen lipun päivä");
-  }
-
-  ics += "END:VCALENDAR";
-
-  const blob = new Blob([ics], { type:"text/calendar;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download =
-    yearsAhead === 0
-      ? `suomen-liputuspaivat-${startYear}.ics`
-      : `suomen-liputuspaivat-${startYear}-${endYear}.ics`;
-
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-</script>
-
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
